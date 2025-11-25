@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinanceAuto - Dashboard Financeiro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: #25D366;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        header .logo h1 {
+            font-size: 2rem;
+            font-weight: 600;
+        }
+        header .subtitle p {
+            font-size: 1rem;
+            font-weight: 300;
+        }
+        main {
+            margin-top: 80px;
+            padding: 2rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .balance-card .card {
+            font-size: 1.5rem;
+        }
+        .balance-card .icon {
+            font-size: 3rem;
+            color: #25D366;
+            margin-bottom: 1rem;
+        }
+        .balance-card .balance {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #25D366;
+        }
+        .secondary-cards {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+        .secondary-cards .card {
+            flex: 1;
+            text-align: center;
+        }
+        .secondary-cards .value {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin: 0.5rem 0;
+        }
+        .bar-chart {
+            width: 100%;
+            height: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+        .bar {
+            height: 100%;
+            background-color: #25D366;
+            border-radius: 5px;
+        }
+        .chart-placeholder .card {
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        .categories .card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+        }
+        .categories .icon {
+            font-size: 2rem;
+            color: #25D366;
+            margin-bottom: 0.5rem;
+        }
+        .transactions h3 {
+            margin-bottom: 1rem;
+            color: #25D366;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        table th, table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        table th {
+            background-color: #25D366;
+            color: white;
+            font-weight: 500;
+        }
+        table td[contenteditable="true"] {
+            cursor: pointer;
+            outline: none;
+        }
+        .delete {
+            background: none;
+            border: none;
+            color: #ff0000;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        .floating-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            background-color: #25D366;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s;
+        }
+        .floating-btn:hover {
+            background-color: #1da851;
+        }
+        /* Modal para adicionar transação */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .modal-content h3 {
+            margin-bottom: 1rem;
+            color: #25D366;
+        }
+        .modal-content label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        .modal-content input, .modal-content select {
+            width: 100%;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: 'Poppins', sans-serif;
+        }
+        .modal-content button {
+            background-color: #25D366;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 0.5rem;
+        }
+        .modal-content button:hover {
+            background-color: #1da851;
+        }
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .secondary-cards {
+                flex-direction: column;
+            }
+            .categories {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            table {
+                font-size: 0.9rem;
+            }
+            table th, table td {
+                padding: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>FinanceAuto</h1>
+        </div>
+        <div class="subtitle">
+            <p>Seu painel inteligente de finanças</p>
+        </div>
+    </header>
+    <main>
+        <section class="balance-card">
+            <div class="card">
+                <i class="fas fa-wallet icon"></i>
+                <h2>Saldo Atual</h2>
+                <p class="balance">R$ 0,00</p>
+            </div>
+        </section>
+        <section class="secondary-cards">
+            <div class="card">
+                <h3>Entradas</h3>
+                <p class="value">R$ 0,00</p>
+                <div class="bar-chart">
+                    <div class="bar" style="width: 0%;"></div>
+                </div>
+            </div>
+            <div class="card">
+                <h3>Saídas</h3>
+                <p class="value">R$ 0,00</p>
+                <div class="bar-chart">
+                    <div class="bar" style="width: 0%;"></div>
+                </div>
+            </div>
+        </section>
+        <section class="chart-placeholder">
+            <div class="card">
+                <h3>Gráfico Mensal</h3>
+                <p>(placeholder)</p>
+            </div>
+        </section>
+        <section class="categories">
+            <div class="card">
+                <i class="fas fa-utensils icon"></i>
+                <p>Alimentação</p>
+            </div>
+            <div class="card">
+                <i class="fas fa-car icon"></i>
+                <p>Transporte</p>
+            </div>
+            <div class="card">
+                <i class="fas fa-gamepad icon"></i>
+                <p>Lazer</p>
+            </div>
+            <div class="card">
+                <i class="fas fa-home icon"></i>
+                <p>Contas Fixas</p>
+            </div>
+        </section>
+        <section class="transactions">
+            <h3>Histórico Financeiro</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome da Transação</th>
+                        <th>Tipo</th>
+                        <th>Data</th>
+                        <th>Valor</th>
+                        <th>Ações</th> <!-- Added for delete button -->
+                    </tr>
+                </thead>
+                <tbody id="transaction-table">
+                    <!-- Tabela começa vazia -->
+                </tbody>
+            </table>
+        </section>
+    </main>
+    <button class="floating-btn" id="add-transaction-btn">+</button>
+    <!-- Modal para adicionar transação -->
+    <div id="add-transaction-modal" class="modal">
+        <div class="modal-content">
+            <h3>Adicionar Nova Transação</h3>
+            <label for="transaction-name">Nome da Transação:</label>
+            <input type="text" id="transaction-name" placeholder="Ex: Compra no mercado">
+            <label for="transaction-type">Tipo:</label>
+            <select id="transaction-type">
+                <option value="Entrada">Entrada</option>
+                <option value="Saída">Saída</option>
+            </select>
+            <label for="transaction-date">Data:</label>
+            <input type="date" id="transaction-date" placeholder="Ex: 15/11">
+            <label for="transaction-value">Valor:</label>
+            <input type="text" id="transaction-value" placeholder="Ex: R$ 100,00">
+            <button id="save-transaction">Salvar</button>
+            <button id="cancel-transaction">Cancelar</button>
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Always start with empty history (as per original)
+            localStorage.removeItem("transactions");
+
+            const modal = document.getElementById("add-transaction-modal");
+            const addBtn = document.getElementById("add-transaction-btn");
+            const saveBtn = document.getElementById("save-transaction");
+            const cancelBtn = document.getElementById("cancel-transaction");
+            const tableBody = document.getElementById("transaction-table");
+
+            const entradasEl = document.querySelector('.secondary-cards .card:nth-child(1) .value');
+            const saidasEl = document.querySelector('.secondary-cards .card:nth-child(2) .value');
+            const saldoEl = document.querySelector('.balance-card .balance');
+
+            // Open modal
+            addBtn.onclick = () => modal.style.display = "flex";
+            // Close modal
+            cancelBtn.onclick = () => modal.style.display = "none";
+
+            // Save new transaction
+            saveBtn.onclick = () => {
+                let name = document.getElementById("transaction-name").value.trim();
+                let type = document.getElementById("transaction-type").value;
+                let date = document.getElementById("transaction-date").value;
+                let valueInput = document.getElementById("transaction-value").value.trim();
+
+                if (!name || !type || !date || !valueInput) {
+                    return alert("Preencha todos os campos!");
+                }
+
+                // Parse value more robustly (remove R$, handle commas/periods)
+                let val = parseFloat(valueInput.replace(/R\$\s*/g, "").replace(",", ".")) || 0;
+                if (isNaN(val) || val < 0) {
+                    return alert("Valor inválido! Use um número positivo.");
+                }
+
+                // Basic date validation (ensure it's not in the future or invalid)
+                let transactionDate = new Date(date);
+                if (isNaN(transactionDate.getTime()) || transactionDate > new Date()) {
+                    return alert("Data inválida! Use uma data passada ou presente.");
+                }
+
+                let transaction = {
+                    name,
+                    type,
+                    date,
+                    value: "R$ " + val.toFixed(2).replace(".", ",")
+                };
+
+                let list = JSON.parse(localStorage.getItem("transactions")) || [];
+                list.push(transaction);
+                localStorage.setItem("transactions", JSON.stringify(list));
+
+                load();
+                modal.style.display = "none";
+                // Clear form
+                document.getElementById("transaction-name").value = "";
+                document.getElementById("transaction-date").value = "";
+                document.getElementById("transaction-value").value = "";
+            };
+
+            // Load and display transactions (with sorting by date descending)
+            function load() {
+                let list = JSON.parse(localStorage.getItem("transactions")) || [];
+                // Sort by date (newest first)
+                list.sort((a, b) => new Date(b.date) - new Date(a.date));
+                tableBody.innerHTML = "";
+
+                list.forEach((t, i) => {
+                    tableBody.innerHTML += `
+                        <tr data-index="${i}">
+                            <td contenteditable="true">${t.name}</td>
+                            <td contenteditable="true">${t.type}</td>
+                            <td contenteditable="true">${t.date}</td>
+                            <td contenteditable="true">${t.value}</td>
+                            <td><button class="delete" data-i="${i}">✖</button></td>
+                        </tr>
+                    `;
+                });
+
+                calc();
+            }
+
+            // Handle deletes and edits
+            tableBody.onclick = e => {
+                if (e.target.classList.contains("delete")) {
+                    if (confirm("Tem certeza que deseja excluir esta transação?")) {
+                        let index = e.target.getAttribute("data-i");
+                        let list = JSON.parse(localStorage.getItem("transactions")) || [];
+                        list.splice(index, 1);
+                        localStorage.setItem("transactions", JSON.stringify(list));
+                        load();
+                    }
+                }
+            };
+
+            // Save edits on blur (when user finishes editing a cell)
+            tableBody.addEventListener("blur", e => {
+                if (e.target.tagName === "TD" && e.target.isContentEditable) {
+                    let row = e.target.closest("tr");
+                    let index = row.getAttribute("data-index");
+                    let list = JSON.parse(localStorage.getItem("transactions")) || [];
+                    if (list[index]) {
+                        let cells = row.querySelectorAll("td");
+                        list[index].name = cells[0].textContent.trim();
+                        list[index].type = cells[1].textContent.trim();
+                        list[index].date = cells[2].textContent.trim();
+                        list[index].value = cells[3].textContent.trim();
+                        localStorage.setItem("transactions", JSON.stringify(list));
+                        calc(); // Recalculate after edit
+                    }
+                }
+            }, true);
+
+            // Calculate totals and update UI
+            function calc() {
+                let list = JSON.parse(localStorage.getItem("transactions")) || [];
+                let entradas = 0, saidas = 0;
+
+                list.forEach(t => {
+                    let v = parseFloat(t.value.replace("R$ ", "").replace(",", ".")) || 0;
+                    if (t.type === "Entrada") entradas += v;
+                    else saidas += v;
+                });
+
+                let saldo = entradas - saidas;
+
+                entradasEl.textContent = "R$ " + entradas.toFixed(2).replace(".", ",");
+                saidasEl.textContent = "R$ " + saidas.toFixed(2).replace(".", ",");
+                saldoEl.textContent = "R$ " + saldo.toFixed(2).replace(".", ",");
+
+                // Update bars (avoid division by zero)
+                let max = Math.max(entradas, saidas, 1);
+                document.querySelector('.secondary-cards .card:nth-child(1) .bar').style.width = (entradas / max * 100) + "%";
+                document.querySelector('.secondary-cards .card:nth-child(2) .bar').style.width = (saidas / max * 100) + "%";
+            }
+
+            // Initial load
+            load();
+        });
+    </script>
+</body>
+</html>
